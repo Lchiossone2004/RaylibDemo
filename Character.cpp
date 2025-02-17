@@ -1,30 +1,25 @@
 #include "raylib.h"
 #include "Character.h"
-#define MAP_WIDTH 50
-#define MAP_HEIGHT 38
-#define TILE_WIDTH 28
-#define TILE_HEIGHT 28  
-#define STEP 3
+#include <cmath> 
+#define MAP_WIDTH 40
+#define MAP_HEIGHT 30
+#define TILE_WIDTH 16
+#define TILE_HEIGHT 16  
 
-void Character::Draw(int currentFrame) {
-    //DrawCircle(posX,posY,radious,WHITE);
-    Rectangle frame = {(CurrentTexture.width/2)*currentFrame,0,CurrentTexture.width/2,CurrentTexture.height};
-    DrawTextureRec(CurrentTexture,frame,{posX,posY}, WHITE);
+Character::Character(float x, float y,Texture2D texture,int textureColums, int textureRows,int scale,int newstep){
+    posX = x;
+    posY = y;
+    textScale = scale;
+    step = newstep;
+    MovementTexture = texture;
+    TextureWith = (texture.width/textureColums);
+    TextureHeigh = (texture.height/textureRows);
 }
 
-void Character::DrawHit(int currentFrame){
-    Rectangle frame = {(CurrentTexture.width/2)*currentFrame,0,CurrentTexture.width/2,CurrentTexture.height};
-    if(currentFrame == 0){
-        DrawTextureRec(CurrentTexture,frame,{posX,posY}, WHITE);
-    }
-    else{
-        DrawTextureRec(CurrentTexture,frame,{posX,posY}, RED);
-    }
-}
-
-void Character::ChangeDirection(float x, float y){
-    Direction.x = x;
-    Direction.y = y;
+void Character::Draw() {
+    Rectangle destRec = { posX, posY, TextureWith * textScale, TextureHeigh * textScale };
+    Vector2 origin = { 0, 0 };
+    DrawTexturePro(MovementTexture, TextureFrame, destRec, origin, 0.0f, WHITE);
 }
 
 static bool IsSolid(int x, int y, int **map) {
@@ -32,60 +27,59 @@ static bool IsSolid(int x, int y, int **map) {
     return map[y][x] == 1;
 }
 
+
+void Character::ChangeDirection() {
+    float magnitude = sqrt(Direction.x * Direction.x + Direction.y * Direction.y);
+    
+    // Evitar dividir por 0
+    if (magnitude > 0) {
+        Direction.x = Direction.x / magnitude;
+        Direction.y = Direction.y / magnitude;
+    } else {
+        Direction.x = 0;
+        Direction.y = 0;
+    }
+}
 void Character::Update(int **map, int currentFrame) {
-    float newX = posX + Direction.x*STEP;
-    float newY = posY + Direction.y*STEP;
+    float newX = posX + Direction.x * step;
+    float newY = posY + Direction.y * step;
 
-        // Convert new position to tile coordinates
-        int tileX1 = newX / TILE_WIDTH;                   // Top-left
-        int tileY1 = newY / TILE_HEIGHT;
-        int tileX2 = (newX + CurrentTexture.width/2 - 1) / TILE_WIDTH;  // Top-right
-        int tileY2 = (newY + CurrentTexture.height - 1) / TILE_HEIGHT;
+    // Convert new position to tile coordinates (textScaled correctly)
+    int tileX1 = (newX / textScale) / TILE_WIDTH;                   // Top-left
+    int tileY1 = (newY / textScale) / TILE_HEIGHT;
+    int tileX2 = ((newX + TextureWith - 1) / textScale) / TILE_WIDTH;  // Top-right
+    int tileY2 = ((newY + TextureHeigh - 1) / textScale) / TILE_HEIGHT;
 
-    // Check all corners for collision
-    if (!IsSolid(tileX1, tileY1,map) && !IsSolid(tileX2, tileY1,map) &&
-    !IsSolid(tileX1, tileY2,map) && !IsSolid(tileX2, tileY2,map)) {
-    // Only move if no collision
-    posX = newX;
-    posY = newY;
+    // Check collision with textScaled map coordinates
+    if (!IsSolid(tileX1, tileY1, map) && !IsSolid(tileX2, tileY1, map) &&
+        !IsSolid(tileX1, tileY2, map) && !IsSolid(tileX2, tileY2, map)) {
+        // Move only if no collision
+        posX = newX;
+        posY = newY;
+    }
+    else{
+        Direction.x *=-1;
+        Direction.y *=-1;
     }
 
-     // Keep player inside screen bounds
-     if (posX <= 0){
-        posX = 0;
-        Direction.x = 1;
-    }
-    if (posX >= GetScreenWidth() - CurrentTexture.width/2){ 
-        posX = GetScreenWidth() - CurrentTexture.width/2;
-        Direction.x = -1;
-    }
-    if (posY <= 0) {
-        posY = 0;
-        Direction.y *= -1;
-    }
-    if (posY >= GetScreenHeight() - CurrentTexture.height){
-        posY = GetScreenHeight() - CurrentTexture.height;
-        Direction.y *= -1;
-    }
+    // Keep Character inside screen bounds
+    if (posX < 0) posX = 0;
+    if (posX > GetScreenWidth() - (TextureWith * textScale)) posX = GetScreenWidth() - (TextureWith * textScale);
+    if (posY < 0) posY = 0;
+    if (posY > GetScreenHeight() - (TextureHeigh * textScale)) posY = GetScreenHeight() - (TextureHeigh * textScale);
 
-
-    if(Direction.x == 1 && Direction.y == 0){
-        CurrentTexture = AllTextures[2];
-    }
-
-    if(Direction.x == -1 && Direction.y == 0){
-        CurrentTexture = AllTextures[3];
-    }
-
-    if(Direction.x == 0 && Direction.y == 1){
-        CurrentTexture = AllTextures[0];
-    }
-
-    if(Direction.x == 0 && Direction.y == -1){
-        CurrentTexture = AllTextures[1];
+    // Update animation frame
+    if (Direction.x == 1 && Direction.y == 0) {
+        TextureFrame = {TextureWith * currentFrame, TextureHeigh * 0, TextureWith, TextureHeigh};
+    } else if (Direction.x == -1 && Direction.y == 0) {
+        TextureFrame = {TextureWith * currentFrame, TextureHeigh * 1, TextureWith, TextureHeigh};
+    } else if (Direction.x == 0 && Direction.y == 1) {
+        TextureFrame = {TextureWith * currentFrame, TextureHeigh * 2, TextureWith, TextureHeigh};
+    } else if (Direction.x == 0 && Direction.y == -1) {
+        TextureFrame = {TextureWith * currentFrame, TextureHeigh * 3, TextureWith, TextureHeigh};
     }
 }
 
-void Character::UpdateTexture(Texture2D *texture){
-    AllTextures = texture;
-}
+
+float Character::GetPosX(){ return posX;}
+float Character::GetPosY(){return posY;}

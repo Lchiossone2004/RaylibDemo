@@ -6,7 +6,16 @@
 #define TILE_HEIGHT 28  
 #define STEP 3
 
-void Enemy::Speed(float x, float y){
-    SpeedX = x;
-    SpeedY = y;
+void Enemy::UpdateStep(int newStep){
+    step = newStep;
+}
+
+void Enemy::KeepInbound(){
+    if(posX >= spownPoint.x + movementRadious || posX <= spownPoint.x - movementRadious){
+        Direction.x *= -1;
+    }
+    if(posY >= spownPoint.y + movementRadious || posY <= spownPoint.y - movementRadious){
+        Direction.y *= -1;
+    }
+    
 }

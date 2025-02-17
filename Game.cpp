@@ -5,13 +5,14 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "colisionMap.h"
+#define SCALE 2
 using namespace std;
 
 int **SetUpMap();
-void UploadMap(int **colMap, int map[38][50]);
+void UploadMap(int **colMap, int map[30][50]);
 
 int main(void){   
-    InitWindow(1390, 1064, "link (no zelda (nintendo no me denuncies))");
+    InitWindow(640*SCALE, 480*SCALE, "link (no zelda (nintendo no me denuncies))");
     InitAudioDevice();
     SetTargetFPS(60);
 
@@ -21,26 +22,20 @@ int main(void){
     Music MenuMusic = LoadMusicStream("./Music/MenuMusic.mp3");
     PlayMusicStream(MenuMusic);  // ✅ Start playing the music
 
-    // Load Player sprites
-    Texture2D Front[2] = {LoadTexture("./Sprites/Zelda/ZeldaFront1.png"),LoadTexture("./Sprites/Zelda/ZeldaFront2.png")};
-    Texture2D Left[2] = {LoadTexture("./Sprites/Zelda/ZeldaLeft1.png"),LoadTexture("./Sprites/Zelda/ZeldaLeft2.png")};
-    Texture2D Back[2] = {LoadTexture("./Sprites/Zelda/ZeldaBack1.png"),LoadTexture("./Sprites/Zelda/ZeldaBack2.png")};
-    Texture2D Right[2] = {LoadTexture("./Sprites/Zelda/ZeldaRight1.png"),LoadTexture("./Sprites/Zelda/ZeldaRight2.png")};
-    Texture2D background = LoadTexture("./Sprites/Stage/Garden.png"); 
+    Texture2D background = LoadTexture("./Sprites/Stage/CastleGarden.png"); 
+    Texture2D PlayerMovement = LoadTexture("./Sprites/Zelda/ZeldaMovement.png");
     Texture2D WeaponH = LoadTexture("./Sprites/Weapons/Weapon.png");
     Texture2D WeaponV = LoadTexture("./Sprites/Weapons/WeaponVertical.png");
-    Texture2D Soldier[4] = {LoadTexture("./Sprites/Enemy/SoldierFront.png"),LoadTexture("./Sprites/Enemy/SoldierBack.png"),LoadTexture("./Sprites/Enemy/SoldierRight.png"),LoadTexture("./Sprites/Enemy/SoldierLeft.png")};
-
+    Texture2D GuardMovement = LoadTexture("./Sprites/Enemy/GuardMovement.png");
     
     int currentFrame = 0;
     float animationSpeed = 0.4f;
     float timeCounter = 0.0f;
 
     //Inicializo los personajes
-    Player Princes(GetScreenWidth()/2,GetScreenHeight()/2, Front[0],false,0.0f);
-    Enemy Knight;
-    Knight.UpdateTexture(Soldier);
-    Knight.Direction = {0,1};
+    Player Princes(GetScreenWidth()/2,GetScreenHeight()/2, PlayerMovement,3,4,SCALE,3);
+    Enemy Knight(GetScreenWidth()/2,GetScreenHeight()/2, GuardMovement,3,4,SCALE,2);
+    Knight.Direction = {1,0};
 
     //Inicializo las pantallas
     typedef enum { MENU, GAMEPLAY, OPTIONS } GameScreen;
@@ -83,65 +78,31 @@ int main(void){
                     mapUploaded = true;
                 }
                 UpdateMusicStream(GameplayMusic); 
-                DrawTexture(background, 0, 0, WHITE);
+                DrawTextureEx(background,{0,0},0.0f,SCALE, WHITE);
             }
             if(SceneNumber == 1){  //Segunda Pantalla 
                 if(!mapUploaded){
-                int secondMap[38][50];
+                int secondMap[30][50];
                 UploadMap(collisionMap, secondMap);
                 mapUploaded = true;
                 }
                 ClearBackground(GREEN);
 
             }
-            if(IsKeyDown(KEY_D)){ //Moverse hacia la derecha 
-                Princes.Direction  ={1,0};
-               Princes.Update(Right[currentFrame],collisionMap);
+            if (IsKeyDown(KEY_D)) {
+                Princes.Direction.x = 1;
+            } if (IsKeyDown(KEY_A)) {
+                Princes.Direction.x = -1;
+            } if (IsKeyDown(KEY_W)) {
+                Princes.Direction.y = -1;
+            } if (IsKeyDown(KEY_S)) {
+                Princes.Direction.y = 1;
             }
-            else if(IsKeyDown(KEY_A)){ //Moverse hacia la izquierda
-                Princes.Direction  ={-1,0};
-                Princes.Update(Left[currentFrame],collisionMap);
-            }
-            else if(IsKeyDown(KEY_W)){ //Moverse hacia arriba
-                Princes.Direction  ={0,-1};
-                Princes.Update(Back[currentFrame],collisionMap);
-            }
-            else if(IsKeyDown(KEY_S)){ //Moverse hacia abajo 
-                Princes.Direction  ={0,1};
-                Princes.Update(Front[currentFrame],collisionMap);
-            }
+            Princes.ChangeDirection();
+            Princes.Update(collisionMap, currentFrame);
             Princes.Draw();
-            if(IsKeyDown(KEY_SPACE) && !Princes.isAtacking && Princes.attackCooldown == 0){ //Ataque basico 
-                Princes.isAtacking = true;
-                Princes.attackTime = 0.2f;
-                Princes.attackHitbox = (Rectangle){Princes.GetPosX() + 20*Princes.Direction.x, Princes.GetPosY(), 50,50};
-            }
-            if (Princes.isAtacking) {  
-                Princes.attackTime -= GetFrameTime();  
-                if (Princes.attackTime <= 0) {  
-                    Princes.attackCooldown = 0.5f;
-                    Princes.isAtacking = false;  
-                }  
-            }
-            if(Princes.attackCooldown < 0){
-                Princes.attackCooldown = 0;
-            }
-            else if(Princes.attackCooldown != 0){
-        
-                Princes.attackCooldown -= GetFrameTime();  
-            }
-            DrawTexture(Princes.CharacterTexture, Princes.GetPosX(), Princes.GetPosY(), WHITE);
-
-            if (Princes.isAtacking && Princes.attackCooldown == 0) {
-                if(Princes.Direction.x != 0){
-                Vector2 weaponPos = {Princes.GetPosX() + 50*Princes.Direction.x, Princes.GetPosY() + 25};
-               DrawTexture(WeaponH,weaponPos.x,weaponPos.y,WHITE);  // Dibujar hitbox de ataque para depuración
-                }
-                if(Princes.Direction.y != 0){
-                    Vector2 weaponPos = {Princes.GetPosX() + 25, Princes.GetPosY() + 50*Princes.Direction.y};
-                   DrawTexture(WeaponV,weaponPos.x,weaponPos.y,WHITE);  // Dibujar hitbox de ataque para depuración
-                    }
-            }
+            Princes.Direction = {0,0};
+          
 
             //Chequeo si cambio de escenaario
             
@@ -151,28 +112,9 @@ int main(void){
             }
 
             //Comportamiento del enemigo
-
-            //Chequeo la colision entre el ataque y el enemigo
-            if(CheckCollisionRecs({Knight.posX,Knight.posY,(float)Knight.CurrentTexture.width/2,(float)Knight.CurrentTexture.height},Princes.attackHitbox) && Princes.isAtacking && !Knight.inv){
-                Knight.health -= Princes.attackDamage;
-                Knight.ChangeDirection(Princes.Direction.x,Princes.Direction.y);
-                Knight.inv = true;
-                Knight.invTime = 0.5f;
-            }
-            if (Knight.inv) {  
-                Knight.invTime -= GetFrameTime();  
-                if (Knight.invTime <= 0) {  
-                    Knight.inv = false; 
-                    Knight.Speed(0,0);
-                    Knight.Draw(currentFrame);
-                }  
-                Knight.DrawHit(currentFrame);
-            }
-            if(!Knight.inv && Knight.health >0){
-                Knight.Draw(currentFrame);
-            }
+            Knight.KeepInbound();
             Knight.Update(collisionMap,currentFrame);
-
+            Knight.Draw();
         break;
 
         case OPTIONS:
@@ -185,16 +127,8 @@ int main(void){
 
      //Liberamos la memeoria usada y cerrramos todo 
     UnloadTexture(background);
-    for(int i = 0; i<2; i ++){
-        UnloadTexture(Front[i]);
-        UnloadTexture(Back[i]);
-        UnloadTexture(Right[i]);
-        UnloadTexture(Left[i]);
-    }
-    for(int i = 0; i<4; i ++){
-        UnloadTexture(Soldier[i]);
-    }
-
+    UnloadTexture(PlayerMovement);
+    UnloadTexture(GuardMovement);
     UnloadMusicStream(GameplayMusic);
     UnloadMusicStream(MenuMusic);
     free(collisionMap);
@@ -205,7 +139,7 @@ int main(void){
 }
 
 int **SetUpMap(){
-    int rows = 38;
+    int rows = 30;
     int cols = 50;
 
     // Allocate an array of int* (for each row)
@@ -225,8 +159,8 @@ int **SetUpMap(){
     return colMap;
 }
 
-void UploadMap(int **colMap, int map[38][50]){
-    int rows = 38;
+void UploadMap(int **colMap, int map[30][50]){
+    int rows = 30;
     int cols = 50;
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {

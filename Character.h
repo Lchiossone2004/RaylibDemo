@@ -4,28 +4,31 @@
 #include "raylib.h"
 
 class Character {
-public:
-    //Data
-    float posX = GetScreenWidth()/2 + 100, posY = GetScreenHeight()/2 + 100;  // Initialize position variables
-    int health = 1000;
+    public:
+    //basic presets
+    int textScale;
+    int step;
+    float posX, posY;
+    Vector2 Direction = {0,1};
+    float health;
+    //Texture settings
+    Texture2D MovementTexture;
+    Rectangle TextureFrame;
+    float TextureWith;
+    float TextureHeigh; 
+    //Attack settings
+    bool isAtacking = false;
+    //Invencibility
     bool inv = false;
-    float invTime = 0;
-    float SpeedX = 0, SpeedY = 0;
-    bool isAtacking;
-    float attackTime;
-    float attackCooldown = 0;
-    float attackDamage = 50;
-    Rectangle attackHitbox;
-    Texture2D CurrentTexture;
-    Texture2D *AllTextures;
-    Vector2 Direction;
+    float invTime = 0.0f;
 
-    //Functions
-    void UpdateTexture(Texture2D *texture);
-    void Draw(int curentFrame);
-    void Update(int **map, int currentFrame);
-    void DrawHit(int curentFrame);
-    void ChangeDirection(float x, float y);
+public:
+    Character(float x, float y,Texture2D texture,int textureColums, int textureRows, int scale, int speed);
+    void Draw();
+    void ChangeDirection();
+    void Update(int **map,int currentFrame);
+    float GetPosX();
+    float GetPosY();
 };
 
 #endif
