@@ -51,6 +51,7 @@ int ** CreateCollisionMap(){
 }
 
 void MainMenu(AllMusic music){
+    ClearBackground(GREEN);
     UpdateMusicStream(music.MenuMusic);
     DrawText("Main Menu", GetScreenWidth()/2 - MeasureText("Main Menu", 60)/2, GetScreenHeight()/5, 60, BLACK);
     DrawText("Press ENTER to Play", GetScreenWidth()/2 - MeasureText("Press ENTER to Play", 50)/2, GetScreenHeight()/3, 50, DARKGRAY);

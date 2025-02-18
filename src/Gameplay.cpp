@@ -25,19 +25,19 @@ void UpdateTimer(float *timeCounter, int *currentFrame, float animationSpeed){
     }
 }
 
-void ChangeScene(int SceneNumber, AllMusic music, AllTextures textures, int scale){
-    if(SceneNumber == 0){   //Primera Pantalla
+void ChangeScene(int StageNumber, AllMusic music, AllTextures textures, int scale){
+    if(StageNumber == 0){   //Primera Pantalla
         UpdateMusicStream(music.GameplayMusic); 
         DrawTextureEx(textures.background,{0,0},0.0f,scale, WHITE);
     }
-    if(SceneNumber == 1){  //Segunda Pantalla 
+    if(StageNumber == 1){  //Segunda Pantalla 
         ClearBackground(GREEN);
 
     }
 }
-void UploadMap(int** collisionMap,int sceneNumber,bool mapUploaded){             //Mejorar esto!!
-    if(!mapUploaded){
-    if(sceneNumber == 0){
+void UploadMap(int** collisionMap,int StageNumber,bool *mapUploaded){             //Mejorar esto!!
+    if(!*mapUploaded){
+    if(StageNumber == 0){
         int rows = 30;
         int cols = 50;
         for (int i = 0; i < rows; i++) {
@@ -45,15 +45,17 @@ void UploadMap(int** collisionMap,int sceneNumber,bool mapUploaded){            
                 collisionMap[i][j] = scene1[i][j];
          }
      }
+     *mapUploaded = true;
     }
-    if(sceneNumber == 1){
+    if(StageNumber == 1){
         int rows = 30;
         int cols = 50;
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 collisionMap[i][j] = scene2[i][j];
-         }
-     }
+        }
+    }
+     *mapUploaded = true;
     }
 }
 }

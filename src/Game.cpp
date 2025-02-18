@@ -8,48 +8,30 @@ int main(void){
     SetTargetFPS(60);
 
     AllTextures textures = LoadTextures();          //Cargo todas las texturas
-    AllMusic music = LoadMusicTracks();             //Cargo la musica
-    
-    Timer gameTimer;
-
-    //Inicializo los personajes
-    Player Princes(GetScreenWidth()/2,GetScreenHeight()/2, textures.PlayerMovement,3,4,SCALE,3);
-    Enemy Knight(GetScreenWidth()/2,GetScreenHeight()/2, textures.GuardMovement,3,4,SCALE,2);
-
-
-    //Inicializo las pantallas
-    GameScreen currentScreen = MENU; //Arranca en la de menu
-
-    //SceneNumber
-    int SceneNumber = 0;
-    int **collisionMap = CreateCollisionMap();
-    bool mapUploaded = false;
+    AllMusic music = LoadMusicTracks();             //Cargo la musica  
+    Timer gameTimer;                                //Inicio el timer para el gameplay
+    Player Princes(GetScreenWidth()/2,GetScreenHeight()/2, textures.PlayerMovement,3,4,SCALE,3);    //Inicio el Player
+    Enemy Knight(GetScreenWidth()/2,GetScreenHeight()/2, textures.GuardMovement,3,4,SCALE,2);       //Cargo un enemigo 
+    GameScreen currentScreen = MENU;                //Inicio las pantallas (empieza en el menu)
+    int StageNumber = 0;                            //Numero de la pantalla (stage)
+    int **collisionMap = CreateCollisionMap();      //Reservo lugar para el mapa de colisiones 
+    bool mapUploaded = false;                       //Chequeo si se actualiza el mapa de colisiones al cambiar de escena
 
     while (!WindowShouldClose())
     {
-        
         BeginDrawing();
-
-        ClearBackground(GREEN);
-
         switch (currentScreen){
-        
         case MENU:
             MainMenu(music);        
             if (IsKeyPressed(KEY_ENTER)) currentScreen = GAMEPLAY;
         break;
-
         case GAMEPLAY:
             UpdateTimer(&gameTimer.timeCounter,&gameTimer.currentFrame,gameTimer.animationSpeed);
-            ChangeScene(SceneNumber,music,textures,SCALE);
-            UploadMap(collisionMap,SceneNumber,mapUploaded);
+            ChangeScene(StageNumber,music,textures,SCALE);
+            UploadMap(collisionMap,StageNumber,&mapUploaded);
             MovePlayer(&Princes,collisionMap,gameTimer.currentFrame);
-          
-
-            //Chequeo si cambio de escenaario
-            
             if (Princes.GetPosX() >= 645 && Princes.GetPosY() <= 685 && Princes.GetPosY() == 227){
-                SceneNumber = 1;
+                StageNumber = 1;
                 mapUploaded = false;
             }
 
