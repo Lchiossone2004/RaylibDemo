@@ -24,9 +24,9 @@ class Character {
 
 public:
     Character(float x, float y,Texture2D texture,int textureColums, int textureRows, int scale, int speed);
-    void Draw();
-    void ChangeDirection();
-    void Update(int **map,int currentFrame);
+    virtual void Draw();
+    virtual void Move(int **map);
+    void Update(int currentFrame);
     float GetPosX();
     float GetPosY();
 };

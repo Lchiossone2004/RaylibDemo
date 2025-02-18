@@ -1,6 +1,7 @@
 #include "raylib.h"
 #include "Character.h"
 #include <cmath> 
+#include <iostream>
 #define MAP_WIDTH 40
 #define MAP_HEIGHT 30
 #define TILE_WIDTH 16
@@ -27,20 +28,21 @@ static bool IsSolid(int x, int y, int **map) {
     return map[y][x] == 1;
 }
 
-
-void Character::ChangeDirection() {
-    float magnitude = sqrt(Direction.x * Direction.x + Direction.y * Direction.y);
+static void CheckDirection(Vector2 *Direction){
+    float magnitude = sqrt(Direction->x * Direction->x + Direction->y * Direction->y);
     
     // Evitar dividir por 0
     if (magnitude > 0) {
-        Direction.x = Direction.x / magnitude;
-        Direction.y = Direction.y / magnitude;
+        Direction->x = Direction->x / magnitude;
+        Direction->y = Direction->y / magnitude;
     } else {
-        Direction.x = 0;
-        Direction.y = 0;
+        Direction->x = 0;
+        Direction->y = 0;
     }
 }
-void Character::Update(int **map, int currentFrame) {
+
+void Character::Move(int **map) {
+    CheckDirection(&Direction);
     float newX = posX + Direction.x * step;
     float newY = posY + Direction.y * step;
 
@@ -61,13 +63,13 @@ void Character::Update(int **map, int currentFrame) {
         Direction.x *=-1;
         Direction.y *=-1;
     }
-
     // Keep Character inside screen bounds
     if (posX < 0) posX = 0;
     if (posX > GetScreenWidth() - (TextureWith * textScale)) posX = GetScreenWidth() - (TextureWith * textScale);
     if (posY < 0) posY = 0;
     if (posY > GetScreenHeight() - (TextureHeigh * textScale)) posY = GetScreenHeight() - (TextureHeigh * textScale);
-
+}
+void Character::Update(int currentFrame){
     // Update animation frame
     if (Direction.x == 1 && Direction.y == 0) {
         TextureFrame = {TextureWith * currentFrame, TextureHeigh * 0, TextureWith, TextureHeigh};
@@ -78,6 +80,7 @@ void Character::Update(int **map, int currentFrame) {
     } else if (Direction.x == 0 && Direction.y == -1) {
         TextureFrame = {TextureWith * currentFrame, TextureHeigh * 3, TextureWith, TextureHeigh};
     }
+    
 }
 
 

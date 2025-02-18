@@ -7,8 +7,8 @@ int main(void){
 
     AllTextures textures = LoadTextures();          //Cargo todas las texturas
     AllMusic music = LoadMusicTracks();             //Cargo la musica  
+    Gameplay gameplay(GetScreenWidth()/2,GetScreenHeight()/2, textures.PlayerMovement,3,4,SCALE,3);
     Timer gameTimer;                                //Inicio el timer para el gameplay
-    Player Princes(GetScreenWidth()/2,GetScreenHeight()/2, textures.PlayerMovement,3,4,SCALE,3);    //Inicio el Player
     Enemy Knight(GetScreenWidth()/2,GetScreenHeight()/2, textures.GuardMovement,3,4,SCALE,2);       //Cargo un enemigo 
     GameScreen currentScreen = MENU;                //Inicio las pantallas (empieza en el menu)
     int StageNumber = 0;                            //Numero de la pantalla (stage)
@@ -24,18 +24,14 @@ int main(void){
             if (IsKeyPressed(KEY_ENTER)) currentScreen = GAMEPLAY;
         break;
         case GAMEPLAY:
-            UpdateTimer(&gameTimer.timeCounter,&gameTimer.currentFrame,gameTimer.animationSpeed);
-            ChangeScene(StageNumber,music,textures,SCALE);
-            UploadMap(collisionMap,StageNumber,&mapUploaded);
-            MovePlayer(&Princes,collisionMap,gameTimer.currentFrame);
-            if (Princes.GetPosX() >= 645 && Princes.GetPosY() <= 685 && Princes.GetPosY() == 227){
-                StageNumber = 1;
-                mapUploaded = false;
-            }
-
+            gameplay.UpdateTimer(&gameTimer.timeCounter,&gameTimer.currentFrame,gameTimer.animationSpeed);
+            gameplay.ChangeScene(StageNumber,music,textures,SCALE);
+            gameplay.UploadMap(collisionMap,StageNumber,&mapUploaded);
+            gameplay.UpdatePlayer(collisionMap,gameTimer.currentFrame);
             //Comportamiento del enemigo
             Knight.KeepInbound();
-            Knight.Update(collisionMap,gameTimer.currentFrame);
+            Knight.Update(gameTimer.currentFrame);
+            Knight.Move(collisionMap);
             Knight.Draw();
         break;
         case OPTIONS:

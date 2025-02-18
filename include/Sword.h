@@ -1,14 +1,20 @@
+#ifndef SWORD_H
+#define SWORD_H
 #include "raylib.h"
 
-class Sword{
+class Sword {
     public:
-    //Datos basicos
-    float damage = 10;
-    float attackTime = 0.5f;
-    float coldown = 0.3f;
-    //Forma
-    Texture2D weaponTexture = LoadTexture("./Sprites/Weapons/Sword.png");
-    int nSprites;
-    Rectangle attackHitbox;
-    void UnloadSword();
+        Vector2 weaponDirection = {0,0};
+        bool isAttacking;
+        float attackDuration;
+        float attackTimer;
+        Texture2D weaponTexture = LoadTexture("./Sprites/Weapons/Sword.png");
+        float TextureWith = weaponTexture.width;
+        float TextureHeigh = weaponTexture.height;
+        Sword();
+        void Attack();    // Start an attack
+        void Update();    // Handle attack timing
+        void Draw(Vector2 playerPos, float textScale); // Draw the sword
+        void UnloadSword();
 };
+#endif

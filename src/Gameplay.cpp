@@ -1,22 +1,18 @@
 #include "Gameplay.h"
 
-void MovePlayer(Player *Princes,int **collisionMap,int currentFrame){
-    if (IsKeyDown(KEY_D)) {
-        Princes->Direction.x = 1;
-    } if (IsKeyDown(KEY_A)) {
-        Princes->Direction.x = -1;
-    } if (IsKeyDown(KEY_W)) {
-        Princes->Direction.y = -1;
-    } if (IsKeyDown(KEY_S)) {
-        Princes->Direction.y = 1;
-    }
-    Princes->ChangeDirection();
-    Princes->Update(collisionMap, currentFrame);
-    Princes->Draw();
-    Princes->Direction = {0,0};
+Gameplay::Gameplay(int with,int heigh, Texture2D texture, int a, int b, int scale,int c)
+    :Zelda(with,heigh,texture,a,b,scale,c){
 }
 
-void UpdateTimer(float *timeCounter, int *currentFrame, float animationSpeed){
+void Gameplay::UpdatePlayer(int **collisionMap,int currentFrame){
+    Zelda.Move(collisionMap);
+    Zelda.Update(currentFrame);
+    Zelda.Draw();
+    Zelda.ZeldaSword.Update();
+    Zelda.Direction = {0,0};
+}
+
+void Gameplay::UpdateTimer(float *timeCounter, int *currentFrame, float animationSpeed){
     *timeCounter += GetFrameTime();
     if (*timeCounter >= animationSpeed)
     {
@@ -25,7 +21,7 @@ void UpdateTimer(float *timeCounter, int *currentFrame, float animationSpeed){
     }
 }
 
-void ChangeScene(int StageNumber, AllMusic music, AllTextures textures, int scale){
+void Gameplay::ChangeScene(int StageNumber, AllMusic music, AllTextures textures, int scale){
     if(StageNumber == 0){   //Primera Pantalla
         UpdateMusicStream(music.GameplayMusic); 
         DrawTextureEx(textures.background,{0,0},0.0f,scale, WHITE);
@@ -35,7 +31,7 @@ void ChangeScene(int StageNumber, AllMusic music, AllTextures textures, int scal
 
     }
 }
-void UploadMap(int** collisionMap,int StageNumber,bool *mapUploaded){             //Mejorar esto!!
+void Gameplay::UploadMap(int** collisionMap,int StageNumber,bool *mapUploaded){             //Mejorar esto!!
     if(!*mapUploaded){
     if(StageNumber == 0){
         int rows = 30;
