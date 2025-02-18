@@ -12,6 +12,7 @@ class Enemy : public Character{
 
     Enemy(float x, float y,Texture2D texture,int textureColums, int textureRows,int scale,int speed) : Character(x, y, texture, textureColums, textureRows, scale,speed){
         spownPoint = {x,y};
+        Direction = {1,0};
     }
     void KeepInbound();
     void UpdateStep(int newStep);
