@@ -2,13 +2,13 @@
 
 void MovePlayer(Player *Princes,int **collisionMap,int currentFrame){
     if (IsKeyDown(KEY_D)) {
-        (*Princes).Direction.x = 1;
+        Princes->Direction.x = 1;
     } if (IsKeyDown(KEY_A)) {
-        (*Princes).Direction.x = -1;
+        Princes->Direction.x = -1;
     } if (IsKeyDown(KEY_W)) {
-        (*Princes).Direction.y = -1;
+        Princes->Direction.y = -1;
     } if (IsKeyDown(KEY_S)) {
-        (*Princes).Direction.y = 1;
+        Princes->Direction.y = 1;
     }
     Princes->ChangeDirection();
     Princes->Update(collisionMap, currentFrame);

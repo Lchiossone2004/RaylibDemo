@@ -1,7 +1,5 @@
 #include "Game.h"
 
-#define SCALE 2
-
 int main(void){   
     InitWindow(640*SCALE, 480*SCALE, "link (no zelda (nintendo no me denuncies))");
     InitAudioDevice();
@@ -40,15 +38,11 @@ int main(void){
             Knight.Update(collisionMap,gameTimer.currentFrame);
             Knight.Draw();
         break;
-
         case OPTIONS:
-
         break;
         }
-          
         EndDrawing();
     }
-
      //Liberamos la memeoria usada y cerrramos todo 
     UnloadTextures(&textures);
     UnloadMusicTracks(&music);

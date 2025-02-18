@@ -10,6 +10,7 @@
 #include "Sword.h"
 #include "Gameplay.h"
 #include "SetUp.h"
+#define SCALE 2
 
 typedef enum { MENU, GAMEPLAY, OPTIONS } GameScreen;
 struct Timer{
