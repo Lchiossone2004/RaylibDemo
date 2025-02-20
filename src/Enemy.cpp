@@ -16,6 +16,5 @@ void Enemy::KeepInbound(){
     }
     if(posY >= spownPoint.y + movementRadious || posY <= spownPoint.y - movementRadious){
         Direction.y *= -1;
-    }
-    
+    }   
 }

@@ -1,15 +1,22 @@
 #include "Gameplay.h"
 
-Gameplay::Gameplay(int with,int heigh, Texture2D texture, int a, int b, int scale,int c)
-    :Zelda(with,heigh,texture,a,b,scale,c){
+Gameplay::Gameplay(int width, int height,AllTextures *textures, int a, int b, int scale, int c)
+    : Zelda(width, height, textures->PlayerMovement, a,b, scale, c),
+      Enemies(width, height, textures->GuardMovement, a, b, scale, c) {
 }
 
 void Gameplay::UpdatePlayer(int **collisionMap,int currentFrame){
     Zelda.Move(collisionMap);
     Zelda.Update(currentFrame);
-    Zelda.Draw();
+    Zelda.Draw(WHITE);
     Zelda.ZeldaSword.Update();
     Zelda.Direction = {0,0};
+}
+
+void Gameplay::UpdateEnemy(int **collisionMap,int currentFrame){
+    Enemies.Move(collisionMap);
+    Enemies.Update(currentFrame);
+    Enemies.Draw(WHITE);
 }
 
 void Gameplay::UpdateTimer(float *timeCounter, int *currentFrame, float animationSpeed){
@@ -31,6 +38,27 @@ void Gameplay::ChangeScene(int StageNumber, AllMusic music, AllTextures textures
 
     }
 }
+
+void Gameplay::CheckHit(){
+    Rectangle enemyHitbox = {Enemies.posX,Enemies.posY,Enemies.TextureWith,Enemies.TextureHeigh};
+    //Rectangle weaponHitbox = {Zelda.posX,Zelda.posY,Zelda.ZeldaSword.TextureWith,Zelda.ZeldaSword.TextureHeigh};
+    if(CheckCollisionRecs(Zelda.ZeldaSword.hitbox,enemyHitbox) && Zelda.ZeldaSword.isAttacking && !Enemies.inv){
+        Enemies.GetHit();
+        Enemies.health -= Zelda.ZeldaSword.damage;
+        std::cout << "ouch" << std::endl;
+    }
+    if(Enemies.inv){
+        Enemies.invTime -= GetFrameTime();
+    }
+    if(Enemies.invTime < 0){
+        Enemies.inv = false;
+        Enemies.invTime = 0;
+        
+    }
+}
+
+//Actualizo el mapa si se cambia la escena
+
 void Gameplay::UploadMap(int** collisionMap,int StageNumber,bool *mapUploaded){             //Mejorar esto!!
     if(!*mapUploaded){
     if(StageNumber == 0){

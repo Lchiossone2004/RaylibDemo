@@ -17,10 +17,10 @@ Character::Character(float x, float y,Texture2D texture,int textureColums, int t
     TextureHeigh = (texture.height/textureRows);
 }
 
-void Character::Draw() {
+void Character::Draw(Color color) {
     Rectangle destRec = { posX, posY, TextureWith * textScale, TextureHeigh * textScale };
     Vector2 origin = { 0, 0 };
-    DrawTexturePro(MovementTexture, TextureFrame, destRec, origin, 0.0f, WHITE);
+    DrawTexturePro(MovementTexture, TextureFrame, destRec, origin, 0.0f, color);
 }
 
 static bool IsSolid(int x, int y, int **map) {
@@ -69,6 +69,7 @@ void Character::Move(int **map) {
     if (posY < 0) posY = 0;
     if (posY > GetScreenHeight() - (TextureHeigh * textScale)) posY = GetScreenHeight() - (TextureHeigh * textScale);
 }
+
 void Character::Update(int currentFrame){
     // Update animation frame
     if (Direction.x == 1 && Direction.y == 0) {
@@ -83,6 +84,12 @@ void Character::Update(int currentFrame){
     
 }
 
+void Character::GetHit(){
+    if(!inv){
+        inv = true;
+        invTime = 0.5f;
+    }
+    Draw(RED);
+}
 
-float Character::GetPosX(){ return posX;}
-float Character::GetPosY(){return posY;}
+

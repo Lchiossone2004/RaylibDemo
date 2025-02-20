@@ -24,11 +24,10 @@ class Character {
 
 public:
     Character(float x, float y,Texture2D texture,int textureColums, int textureRows, int scale, int speed);
-    virtual void Draw();
+    virtual void Draw(Color color);
     virtual void Move(int **map);
     void Update(int currentFrame);
-    float GetPosX();
-    float GetPosY();
+    void GetHit();
 };
 
 #endif

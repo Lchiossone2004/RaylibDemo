@@ -5,11 +5,12 @@ int main(void){
     InitAudioDevice();
     SetTargetFPS(60);
 
-    AllTextures textures = LoadTextures();          //Cargo todas las texturas
-    AllMusic music = LoadMusicTracks();             //Cargo la musica  
-    Gameplay gameplay(GetScreenWidth()/2,GetScreenHeight()/2, textures.PlayerMovement,3,4,SCALE,3);
+    AllTextures textures;
+    LoadTextures(&textures);          //Cargo todas las texturas
+    AllMusic music;
+    LoadMusicTracks(&music);             //Cargo la musica
+    Gameplay gameplay(GetScreenWidth()/2,GetScreenHeight()/2, &textures,3,4,SCALE,3);
     Timer gameTimer;                                //Inicio el timer para el gameplay
-    Enemy Knight(GetScreenWidth()/2,GetScreenHeight()/2, textures.GuardMovement,3,4,SCALE,2);       //Cargo un enemigo 
     GameScreen currentScreen = MENU;                //Inicio las pantallas (empieza en el menu)
     int StageNumber = 0;                            //Numero de la pantalla (stage)
     int **collisionMap = CreateCollisionMap();      //Reservo lugar para el mapa de colisiones 
@@ -28,11 +29,8 @@ int main(void){
             gameplay.ChangeScene(StageNumber,music,textures,SCALE);
             gameplay.UploadMap(collisionMap,StageNumber,&mapUploaded);
             gameplay.UpdatePlayer(collisionMap,gameTimer.currentFrame);
-            //Comportamiento del enemigo
-            Knight.KeepInbound();
-            Knight.Update(gameTimer.currentFrame);
-            Knight.Move(collisionMap);
-            Knight.Draw();
+            gameplay.UpdateEnemy(collisionMap,gameTimer.currentFrame);
+            gameplay.CheckHit();
         break;
         case OPTIONS:
         break;

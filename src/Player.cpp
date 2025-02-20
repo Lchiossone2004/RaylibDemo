@@ -30,7 +30,7 @@ void Player::Move(int **map){
     }
     Character::Move(map);
 }
-void Player::Draw(){
+void Player::Draw(Color color){
     ZeldaSword.Draw({posX,posY},textScale);
-    Character::Draw();
+    Character::Draw(color);
 }

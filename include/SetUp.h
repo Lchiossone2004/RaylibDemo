@@ -3,6 +3,7 @@
 
 #include"raylib.h"
 #include "iostream"
+
 struct AllTextures{
     Texture2D background;
     Texture2D PlayerMovement;
@@ -14,8 +15,8 @@ struct AllMusic{
     Music GameplayMusic;
     Music MenuMusic;
 };
-AllTextures LoadTextures();
-AllMusic LoadMusicTracks();
+void LoadTextures(AllTextures *textures);
+void LoadMusicTracks(AllMusic *music);
 void UnloadTextures(AllTextures *textures);
 void UnloadMusicTracks(AllMusic *music);
 int ** CreateCollisionMap();

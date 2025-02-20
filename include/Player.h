@@ -13,6 +13,6 @@ class Player : public Character{
     }
     void EquipSword(Sword GreatSword);
     void Move(int **map) override;
-    void Draw() override;
+    void Draw(Color color) override;
 };
 #endif

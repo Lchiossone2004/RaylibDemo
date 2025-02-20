@@ -1,20 +1,16 @@
 #include "SetUp.h"
 
-AllTextures LoadTextures(){
-    AllTextures toRet;
-    toRet.background = LoadTexture("./Sprites/Stage/CastleGarden.png"); 
-    toRet.PlayerMovement = LoadTexture("./Sprites/Zelda/ZeldaMovement.png");
-    toRet.GuardMovement = LoadTexture("./Sprites/Enemy/GuardMovement.png");
-    return toRet;
+void LoadTextures(AllTextures *textures){
+    textures->background = LoadTexture("./Sprites/Stage/CastleGarden.png"); 
+    textures->PlayerMovement = LoadTexture("./Sprites/Zelda/ZeldaMovement.png");
+    textures->GuardMovement = LoadTexture("./Sprites/Enemy/GuardMovement.png");
 }
 
-AllMusic LoadMusicTracks(){
-    AllMusic toRet;
-    toRet.GameplayMusic = LoadMusicStream("./Music/ZeldaMusic.mp3");
-    toRet.MenuMusic = LoadMusicStream("./Music/MenuMusic.mp3");
-    PlayMusicStream(toRet.GameplayMusic);
-    PlayMusicStream(toRet.MenuMusic);  
-    return toRet;
+void LoadMusicTracks(AllMusic *music){
+    music->GameplayMusic = LoadMusicStream("./Music/ZeldaMusic.mp3");
+    music->MenuMusic = LoadMusicStream("./Music/MenuMusic.mp3");
+    PlayMusicStream(music->GameplayMusic);
+    PlayMusicStream(music->MenuMusic);  
 }
 
 void UnloadTextures(AllTextures *textures){
